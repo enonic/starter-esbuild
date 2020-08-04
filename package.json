@@ -1,0 +1,23 @@
+{
+  "name": "starter-esbuild",
+  "version": "1.0.0-SNAPSHOT",
+  "repository": "git@github.com:enonic/starter-vanilla.git",
+  "author": "Christian Westgaard <cwe@enonic.com>",
+  "license": "Apache-2.0",
+  "private": true,
+  "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "buffer": "^5.6.0",
+    "esbuild": "^0.6.16",
+    "get-value": "^3.0.1",
+    "polyfill-crypto.getrandomvalues": "^1.0.0",
+    "ponyfill-array-find": "^1.0.1",
+    "postcss-cli": "^7.1.1",
+    "postcss-preset-env": "^6.7.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "serialize-javascript": "^4.0.0",
+    "set-value": "^3.0.2",
+    "stylus": "^0.54.8"
+  }
+}

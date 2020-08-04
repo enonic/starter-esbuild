@@ -1,0 +1,14 @@
+@import 'variables';
+
+// Not supported by jsass nor com.meiuwa.gradle.sass
+//@use 'variables';
+
+.scss {
+	::placeholder {
+		color: $color-red
+	}
+}
+
+.scss-background-url-enonic {
+	background: url('../../images/svg/enonic.svg');
+}

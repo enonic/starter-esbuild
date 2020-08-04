@@ -1,0 +1,236 @@
+plugins {
+    id 'com.enonic.xp.app' version '2.0.0'
+    id 'com.github.node-gradle.node' version '2.2.4'
+    id 'com.meiuwa.gradle.sass' version '2.0.0'
+    id 'com.eriwen.gradle.css' version '2.14.0' // Less and CSS
+}
+
+app {
+    name = "${appName}"
+    displayName = "${appDisplayName}"
+    vendorName = "${vendorName}"
+    vendorUrl = "${vendorUrl}"
+    systemVersion = "${xpVersion}"
+}
+
+dependencies {
+    compile "com.enonic.xp:core-api:${xpVersion}"
+    compile "com.enonic.xp:portal-api:${xpVersion}"
+    include "com.enonic.xp:lib-content:${xpVersion}"
+    include "com.enonic.xp:lib-portal:${xpVersion}"
+    include "com.enonic.lib:lib-thymeleaf:2.0.0"
+    //include "com.enonic.xp:lib-auth:${xpVersion}"
+    //include "com.enonic.xp:lib-context:${xpVersion}"
+    //include "com.enonic.xp:lib-i18n:${xpVersion}"
+    //include "com.enonic.xp:lib-io:${xpVersion}"
+    //include "com.enonic.xp:lib-mail:${xpVersion}"
+    //include "com.enonic.xp:lib-repo:${xpVersion}"
+    //include "com.enonic.xp:lib-websocket:${xpVersion}"
+    //include "com.enonic.lib:lib-mustache:2.0.0"
+    //include "com.enonic.lib:lib-util:2.0.0"
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    xp.enonicRepo()
+}
+
+node {
+  download = true
+  version = '14.7.0'
+}
+
+yarn.dependsOn(yarn_install)
+
+sass {
+  executable = 'sass'
+  properties = "$rootDir/sass.properties"
+  suffix = 'min.css'
+  preserved = true
+  download {
+    version = '1.25.0'
+    enabled = true
+  }
+}
+
+def srcRootRel = 'src/main/resources'
+def dstRootRel = 'build/resources/main'
+
+//rootDir = projectDir = project.buildscript.sourceFile.parent (all abs to ./)
+//buildDir abs path to ./build
+def File srcRootAbs = new File(rootDir, srcRootRel)
+def File dstRootAbs = new File(rootDir, dstRootRel)
+
+sassCompile {
+    source = file("$srcRootAbs/assets/style/sass/index.sass")
+    output = file("$dstRootAbs/assets/style/sass")
+}
+
+task stylus(type: NpxTask) {
+  dependsOn yarn_install
+  command = 'stylus'
+  args = [
+    "$srcRootAbs/assets/style/stylus/index.styl",
+    '-o',
+    "$dstRootAbs/assets/style/stylus"
+  ]
+}
+
+/*css.source {
+  dev {
+    css {
+      srcDir "$srcRootRel/assets/style/less"
+      include "*.less"
+    }
+  }
+}*/
+
+lesscss {
+    source = fileTree("$srcRootRel/assets/style/less/index.less")
+    dest = "$dstRootRel/assets/style/less"
+}
+
+combineCss {
+    dependsOn lesscss
+    mustRunAfter lesscss
+    dependsOn sassCompile
+    mustRunAfter sassCompile
+    dependsOn stylus
+    mustRunAfter stylus
+    source fileTree("$srcRootRel/assets/style/css")
+    source fileTree("$dstRootRel/assets/style")
+    dest = "$dstRootAbs/assets/style/all.css"
+}
+
+task postcss(type: NpxTask) {
+  dependsOn yarn_install
+  dependsOn combineCss
+  mustRunAfter combineCss
+  command = 'postcss'
+  args = [
+    "$dstRootAbs/assets/style/all.css",
+    '--no-map',
+    '--env', 'production',
+    //'-u', 'autoprefixer', // Use postcss.config.js file instead
+    //'-d', "$dstRootAbs/assets/style",
+    '-o', "$dstRootAbs/assets/style/all.post.css"
+  ]
+}
+
+minifyCss {
+  dependsOn postcss
+  mustRunAfter postcss
+  source = "$dstRootAbs/assets/style/all.post.css"
+  dest = "$dstRootRel/assets/style/all.min.css"
+  yuicompressor { // Optional
+    lineBreakPos = -1
+  }
+}
+
+task copyReact(type: Copy) {
+    from "node_modules/react/umd/"
+    into "$dstRootRel/assets/js/react/"
+}
+
+task copyReactDom(type: Copy) {
+    from "node_modules/react-dom/umd/"
+    into "$dstRootRel/assets/js/react-dom/"
+}
+
+task copyNodeModuleAssets(type: Copy) {
+  dependsOn copyReact
+  dependsOn copyReactDom
+}
+
+task esbuildReactAssets(type: NpxTask) {
+  dependsOn copyNodeModuleAssets
+  mustRunAfter copyNodeModuleAssets
+  dependsOn yarn_install
+
+  command = 'esbuild'
+  args = [
+    '--bundle',
+    //'--define:process.env.NODE_ENV="development"',
+    '--define:process.env.NODE_ENV="production"',
+
+    // Nope this fails runtime
+    //'--external:react',
+    //'--external:react-dom',
+
+    '--format=esm',
+    //'--format=iife',
+
+    '--minify',
+    "--outdir=$dstRootRel/assets",
+    '--out-extension:.js=.mjs',
+    '--platform=browser',
+    '--sourcemap',
+
+    "$srcRootRel/assets/aComponent.jsx"
+  ]
+}
+
+task esbuildShims(type: NpxTask) {
+  dependsOn yarn_install
+  dependsOn esbuildReactAssets
+
+  command = 'esbuild'
+  args = [
+    '--bundle',
+    '--format=cjs',
+
+    '--loader:.es=ts',
+
+    //'--minify',
+
+    "--outdir=$dstRootRel/lib/nashorn/",
+
+    // browser or node, default browser
+    '--platform=browser',
+    //'--platform=node',
+
+    '--strict', // Allow code bloat to support obscure edge case
+
+    // esN, chromeN, edgeN, firefoxN, iosN, nodeN, safariN
+    '--target=es2015',
+    //'--target=es5',
+    //'--target=node3',
+
+    "$srcRootRel/lib/nashorn/ponyfills.es",
+    "$srcRootRel/lib/nashorn/polyfills.es"
+  ]
+}
+
+task esbuild(type: NodeTask) {
+  dependsOn yarn_install
+  dependsOn esbuildShims
+  script file('esbuild.mjs')
+}
+
+processResources {
+  dependsOn minifyCss
+  mustRunAfter minifyCss
+	dependsOn esbuild
+	mustRunAfter esbuild
+
+  exclude '**/.gitkeep'
+
+  // Let esbuild handle these (rather than gradle)
+  exclude '**/*.css'
+  exclude '**/*.es'
+  exclude '**/*.js'
+  exclude '**/*.jsx'
+  exclude '**/*.less'
+  exclude '**/*.sass'
+  exclude '**/*.scss'
+  exclude '**/*.styl'
+}
+
+tasks.withType(Copy) {
+  includeEmptyDirs = false
+}
+
+wrapper {
+	distributionUrl = 'https://services.gradle.org/distributions/gradle-5.6.4-all.zip'
+}
