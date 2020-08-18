@@ -208,6 +208,14 @@ task esbuild(type: NodeTask) {
   script file('esbuild.mjs')
 }
 
+task watch(type: NodeTask) {
+  dependsOn esbuild
+  script file('esbuild.mjs')
+  args = [
+    '--watch'
+  ]
+}
+
 processResources {
   dependsOn minifyCss
   mustRunAfter minifyCss

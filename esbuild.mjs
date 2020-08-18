@@ -2,11 +2,16 @@ import {
   //exec,
   execSync
 } from 'child_process';
-import fs from 'fs';
+import {
+  mkdirSync,
+  readFileSync,
+  writeFileSync
+} from 'fs';
 import glob from 'glob';
+import watch from 'node-watch';
 import path from 'path';
 
-//const toStr = v => JSON.stringify(v, null, 4);
+const toStr = v => JSON.stringify(v, null, 4);
 //console.log(`process.env:${toStr(process.env)}`);
 
 //const NODE_ENV = 'development';
@@ -61,9 +66,9 @@ const SERVER_JS_FILES = glob.sync(`${SRC_DIR}/**/${JS_EXTENSION_GLOB_BRACE}`, {
 });
 //console.log(`SERVER_JS_FILES:${toStr(SERVER_JS_FILES)}`);
 
-SERVER_JS_FILES.forEach((srcFile) => {
+/*SERVER_JS_FILES.forEach((srcFile) => {
   COMMAND_ARGS.push(srcFile);
-});
+});*/
 
 const COMMAND = COMMAND_ARGS.join(' ');
 //console.log(`COMMAND: ${COMMAND}`);
@@ -80,7 +85,7 @@ const COMMAND = COMMAND_ARGS.join(' ');
 });*/
 
 let stdout = '';
-stdout += execSync(COMMAND);
+stdout += execSync(COMMAND + ' ' + SERVER_JS_FILES.join(' '));
 if (stdout) {
   console.log(stdout);
 }
@@ -94,9 +99,36 @@ ESBUILT_FILES.forEach((ESBUILT_FILE) => {
   //console.log(`REL_PATH:${toStr(REL_PATH)}`);
   const DIRNAME = path.dirname(REL_PATH);
   //console.log(`DIRNAME:${toStr(DIRNAME)}`);
-  fs.mkdirSync(DIRNAME, { recursive: true });
+  mkdirSync(DIRNAME, { recursive: true });
   var output = [...SHIMS, ESBUILT_FILE].map((f) => {
-    return fs.readFileSync(f).toString();
+    return readFileSync(f).toString();
   }).join('');
-  fs.writeFileSync(REL_PATH, output);
+  writeFileSync(REL_PATH, output);
 });
+
+var myArgs = process.argv.slice(2);
+//console.log(process.argv);
+if (myArgs[0] === '--watch') {
+  console.log('Watching for changes in ./');
+  watch('./', { recursive: true }, function(evt, name) {
+    if(SERVER_JS_FILES.includes(name)) {
+      console.log('Re-transpiling %s', name);
+      let stdoutWatch = '';
+      stdoutWatch += execSync(COMMAND + ' ' + name);
+      if (stdoutWatch) {
+        console.log(stdoutWatch);
+      }
+    } else if (ESBUILT_FILES.includes(name)) {
+      console.log('Re-concatinating %s', name);
+      const REL_PATH = name.replace(DST_ESBUILD_DIR, DST_DIR);
+      const DIRNAME = path.dirname(REL_PATH);
+      mkdirSync(DIRNAME, { recursive: true });
+      var output = [...SHIMS, name].map((f) => {
+        return readFileSync(f).toString();
+      }).join('');
+      writeFileSync(REL_PATH, output);
+    } else {
+      console.log('Ignoring change to %s', name);
+    }
+  });
+}
