@@ -12,7 +12,7 @@ straight to creating what you're creating.
 You first need to install Enonic CLI. Then run the following commands to build and depoy it:
 
 ```bash
-~ $ enonic project create
+~ $ enonic project create -r starter-esbuild
 ... Answer wizard question
 
 ~ $ cd <project-folder>
