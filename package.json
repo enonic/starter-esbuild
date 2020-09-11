@@ -17,7 +17,7 @@
     "postcss-preset-env": "^6.7.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "serialize-javascript": "^4.0.0",
+    "serialize-javascript": "^5.0.1",
     "set-value": "^3.0.2",
     "stylus": "^0.54.8"
   }
