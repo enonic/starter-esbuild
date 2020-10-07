@@ -380,10 +380,10 @@ error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
-esbuild@0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.7.3.tgz#505724ccfeca186b208546de81e18c185cb511a2"
-  integrity sha512-zsS/SXSAUNLJDYDGufSmBckQRLBdkNqz8PXdaDDJZK2VyZLDtilu3FEfIRUxpZMSbIWXVmlGx0Dlb1EoyS3bTA==
+esbuild@0.7.11:
+  version "0.7.11"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.7.11.tgz#e7722e3bd8eabc5b52d1d3c2d7f5e5dd8946dd94"
+  integrity sha512-coV3XUjMVWeO4dqKEMzBncwTYmGnLyxy7Af2w9UR7SMZTxfvJP3BcAvBI6ujNXTdj+zXro7MLMlWhs4MfoMe0g==
 
 escalade@^3.0.1:
   version "3.0.2"
