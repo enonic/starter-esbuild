@@ -13,7 +13,7 @@
     "node-watch": "0.6.4",
     "polyfill-crypto.getrandomvalues": "1.0.0",
     "ponyfill-array-find": "1.0.1",
-    "postcss-cli": "8.0.0",
+    "postcss-cli": "8.1.0",
     "postcss-preset-env": "6.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
