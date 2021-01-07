@@ -7,7 +7,7 @@
   "private": true,
   "devDependencies": {
     "autoprefixer": "10.2.0",
-    "buffer": "5.6.0",
+    "buffer": "6.0.3",
     "esbuild": "0.8.31",
     "get-value": "3.0.1",
     "node-watch": "0.6.4",
