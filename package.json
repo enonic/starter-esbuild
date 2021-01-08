@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
-    "autoprefixer": "10.2.0",
+    "autoprefixer": "10.2.1",
     "buffer": "6.0.3",
     "esbuild": "0.8.31",
     "get-value": "3.0.1",
