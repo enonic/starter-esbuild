@@ -45,7 +45,7 @@ const COMMAND_ARGS = [
   //'--minify'
   `--outdir=${DST_ESBUILD_DIR}`,
   '--platform=browser',
-  '--strict', // Allow code bloat to support obscure edge case
+  //'--strict', // Allow code bloat to support obscure edge case
   '--target=es2015'
 ];
 

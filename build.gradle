@@ -190,7 +190,7 @@ task esbuildShims(type: NpxTask) {
     '--platform=browser',
     //'--platform=node',
 
-    '--strict', // Allow code bloat to support obscure edge case
+    //'--strict', // Allow code bloat to support obscure edge case
 
     // esN, chromeN, edgeN, firefoxN, iosN, nodeN, safariN
     '--target=es2015',
