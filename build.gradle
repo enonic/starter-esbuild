@@ -38,7 +38,7 @@ repositories {
 
 node {
   download = true
-  version = '14.7.0'
+  version = '14.15.4'
 }
 
 yarn.dependsOn(yarn_install)
