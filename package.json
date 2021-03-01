@@ -8,7 +8,7 @@
   "devDependencies": {
     "autoprefixer": "10.2.4",
     "buffer": "6.0.3",
-    "esbuild": "0.8.43",
+    "esbuild": "0.8.53",
     "get-value": "3.0.1",
     "node-watch": "0.7.1",
     "polyfill-crypto.getrandomvalues": "1.0.0",
