@@ -26,4 +26,4 @@ Your brand new app should now be up and running on http://localhost:8080
 
 | Version        | Min XP version |
 | -------------- | -------------- |
-| 1.0.0-SNAPSHOT | 7.0.0 |
+| 1.0.0-SNAPSHOT | 7.5.0 |
